@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LicenseHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f6fb; --card: #ffffff; --ink: #14203a; --muted: #6b7792; --line: #e3e8f2;
+  --brand: #2f6bff; --brand-ink: #ffffff; --brand-soft: #e8efff;
+  --ok: #12a150; --ok-soft: #e3f7ec; --warn: #d98a00; --warn-soft: #fff4dc;
+  --bad: #e5484d; --bad-soft: #fde8e8; --off: #7a8499; --off-soft: #eef0f4;
+  --shadow: 0 1px 2px rgba(20,32,58,.06), 0 6px 20px rgba(20,32,58,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1320; --card: #161d2e; --ink: #e8edf7; --muted: #8b97b0; --line: #26304a;
+    --brand: #5b8cff; --brand-soft: #1d2a4d; --ok: #3ccf7f; --ok-soft: #13301f; --warn: #f2b33d; --warn-soft: #362a10;
+    --bad: #ff6b6f; --bad-soft: #3a1a1c; --off: #9aa3b5; --off-soft: #232b3c; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1320; --card: #161d2e; --ink: #e8edf7; --muted: #8b97b0; --line: #26304a;
+  --brand: #5b8cff; --brand-soft: #1d2a4d; --ok: #3ccf7f; --ok-soft: #13301f; --warn: #f2b33d; --warn-soft: #362a10;
+  --bad: #ff6b6f; --bad-soft: #3a1a1c; --off: #9aa3b5; --off-soft: #232b3c; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 "IBM Plex Sans Thai", system-ui, sans-serif; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13.5px; letter-spacing: .02em; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+header.top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.logo { font-weight: 700; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+.logo i { width: 30px; height: 30px; border-radius: 9px; background: var(--brand); display: grid; place-items: center; color: #fff; font-style: normal; font-size: 16px; }
+.spacer { flex: 1; }
+.btn { border: 1px solid var(--line); background: var(--card); padding: 8px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--brand); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); font-weight: 600; }
+.btn.danger { color: var(--bad); }
+.btn.sm { padding: 4px 10px; font-size: 13px; border-radius: 8px; }
+.btn:disabled { opacity: .5; cursor: default; }
+select, input[type=text], input[type=email], input[type=number], input[type=date], textarea {
+  border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; outline: none; min-width: 0; }
+select:focus, input:focus, textarea:focus { border-color: var(--brand); }
+.tabs { display: flex; gap: 4px; background: var(--card); padding: 4px; border-radius: 12px; border: 1px solid var(--line); }
+.tabs button { border: 0; background: transparent; padding: 7px 14px; border-radius: 9px; cursor: pointer; color: var(--muted); }
+.tabs button.on { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); cursor: pointer; }
+.stat b { display: block; font-size: 26px; line-height: 1.2; }
+.stat span { color: var(--muted); font-size: 13px; }
+.stat.on { border-color: var(--brand); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 14px; border-bottom: 1px solid var(--line); }
+.bar input[type=text] { flex: 1; min-width: 180px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: color-mix(in srgb, var(--brand-soft) 45%, transparent); }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.b-ok { background: var(--ok-soft); color: var(--ok); } .b-warn { background: var(--warn-soft); color: var(--warn); }
+.b-bad { background: var(--bad-soft); color: var(--bad); } .b-off { background: var(--off-soft); color: var(--off); }
+.sub { color: var(--muted); font-size: 12.5px; }
+.empty { padding: 40px; text-align: center; color: var(--muted); }
+.copy { cursor: pointer; border-bottom: 1px dashed var(--muted); }
+.row-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.table-wrap { overflow-x: auto; }
+dialog { border: 0; border-radius: 18px; padding: 0; background: var(--card); color: var(--ink); width: min(560px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+dialog::backdrop { background: rgba(10,16,30,.45); }
+.dlg-h { padding: 18px 20px 4px; font-weight: 700; font-size: 18px; }
+.dlg-b { padding: 10px 20px; display: grid; gap: 12px; }
+.dlg-f { padding: 12px 20px 18px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+label.f { display: grid; gap: 5px; font-size: 13.5px; color: var(--muted); }
+label.f > * { color: var(--ink); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips button { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.chips button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.keys { background: var(--bg); border-radius: 12px; padding: 12px; max-height: 260px; overflow: auto; white-space: pre; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 12px; opacity: 0; transition: .2s; pointer-events: none; z-index: 99; }
+.toast.on { opacity: 1; }
+.login { max-width: 400px; margin: 12vh auto 0; padding: 28px; }
+.login h1 { margin: 0 0 6px; font-size: 22px; }
+.login p { color: var(--muted); margin: 0 0 18px; }
+.login form { display: grid; gap: 10px; }
+.hidden { display: none !important; }
+.muted { color: var(--muted); }
+@media (max-width: 720px) {
+  th.hide-m, td.hide-m { display: none; }
+  .grid2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<!-- login -->
+<div id="loginView" class="card login hidden">
+  <h1>LicenseHub</h1>
+  <p>ระบบไลเซนส์กลางสำหรับทุกเกม — ใส่อีเมลแอดมิน แล้วกดลิงก์ที่ส่งไปในอีเมล</p>
+  <form id="loginForm">
+    <input id="loginEmail" type="email" required placeholder="อีเมลแอดมิน" autocomplete="email">
+    <button class="btn primary" type="submit">ส่งลิงก์เข้าสู่ระบบ</button>
+  </form>
+  <p id="loginMsg" class="sub" style="margin-top:12px"></p>
+</div>
+
+<!-- app -->
+<div id="appView" class="wrap hidden">
+  <header class="top">
+    <div class="logo"><i>🔑</i>LicenseHub</div>
+    <select id="gameFilter" title="เลือกเกม"></select>
+    <div class="tabs" id="tabs">
+      <button data-tab="licenses" class="on">ไลเซนส์</button>
+      <button data-tab="customers">ลูกค้า</button>
+      <button data-tab="games">เกม</button>
+    </div>
+    <div class="spacer"></div>
+    <span id="who" class="sub"></span>
+    <button class="btn sm" id="logoutBtn">ออกจากระบบ</button>
+  </header>
+
+  <!-- licenses -->
+  <section id="tab-licenses">
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <div class="bar">
+        <input type="text" id="licSearch" placeholder="ค้นหา คีย์ / ลูกค้า / หมายเหตุ">
+        <select id="licState">
+          <option value="">ทุกสถานะ</option><option value="active">ใช้งานได้</option><option value="soon">ใกล้หมดอายุ (7 วัน)</option>
+          <option value="expired">หมดอายุ</option><option value="suspended">ระงับ</option><option value="unused">ยังไม่เคยใช้</option>
+        </select>
+        <button class="btn primary" id="newLicBtn">+ ออกคีย์ใหม่</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>คีย์</th><th>ลูกค้า</th><th class="hide-m">เกม</th><th>หมดอายุ</th><th class="hide-m">เครื่อง</th><th class="hide-m">ใช้ล่าสุด</th><th>สถานะ</th><th></th></tr></thead>
+        <tbody id="licBody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- customers -->
+  <section id="tab-customers" class="hidden">
+    <div class="card">
+      <div class="bar">
+        <input type="text" id="cusSearch" placeholder="ค้นหาลูกค้า">
+        <button class="btn primary" id="newCusBtn">+ เพิ่มลูกค้า</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ลูกค้า</th><th>ช่องทางติดต่อ</th><th>ไลเซนส์</th><th class="hide-m">หมายเหตุ</th><th></th></tr></thead>
+        <tbody id="cusBody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- games -->
+  <section id="tab-games" class="hidden">
+    <div class="card" style="margin-bottom:16px">
+      <div class="bar"><b style="flex:1">เกมในระบบ</b><button class="btn primary" id="newGameBtn">+ เพิ่มเกม</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>เกม</th><th>รหัสเกม</th><th>หน้าคีย์</th><th class="hide-m">ออฟไลน์</th><th class="hide-m">เครื่อง/คีย์</th><th class="hide-m">ติดต่อซื้อ</th><th></th></tr></thead>
+        <tbody id="gameBody"></tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="bar"><b style="flex:1">แอดมิน (อีเมลที่เข้าเว็บนี้ได้)</b><button class="btn" id="newAdminBtn">+ เพิ่มแอดมิน</button></div>
+      <div class="table-wrap"><table><tbody id="adminBody"></tbody></table></div>
+    </div>
+  </section>
+</div>
+
+<!-- dialogs -->
+<dialog id="dlg"><form method="dialog" id="dlgForm"><div class="dlg-h" id="dlgTitle"></div><div class="dlg-b" id="dlgBody"></div><div class="dlg-f" id="dlgFoot"></div></form></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://davcmrwqiefzhzwcjktg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_73dCwdGJGhlgm6_dlAQNkA_tV-UwH2-";   // public key: tables are protected by row level security
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let games = [], customers = [], licenses = [], admins = [];
+let tab = "licenses", statFilter = "";
+
+function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2200); }
+async function copy(t, msg) { try { await navigator.clipboard.writeText(t); toast(msg || "คัดลอกแล้ว"); } catch { prompt("คัดลอก:", t); } }
+function fail(e) { console.error(e); toast("ผิดพลาด: " + (e.message || e)); }
+
+// ---------------------------------------------------------------- auth
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return showLogin();
+  $("#who").textContent = session.user.email;
+  const { data: ok, error } = await sb.rpc("is_admin");
+  if (error || !ok) { showLogin("อีเมล " + session.user.email + " ไม่ได้เป็นแอดมิน"); await sb.auth.signOut(); return; }
+  $("#loginView").classList.add("hidden"); $("#appView").classList.remove("hidden");
+  await loadAll();
+}
+function showLogin(msg) { $("#appView").classList.add("hidden"); $("#loginView").classList.remove("hidden"); $("#loginMsg").textContent = msg || ""; }
+$("#loginForm").onsubmit = async e => {
+  e.preventDefault();
+  const email = $("#loginEmail").value.trim();
+  const redirect = location.origin + location.pathname;
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect, shouldCreateUser: true } });
+  $("#loginMsg").textContent = error ? "ส่งไม่สำเร็จ: " + error.message : "ส่งลิงก์ไปที่ " + email + " แล้ว — เปิดอีเมลแล้วกดลิงก์ (ดูในจดหมายขยะด้วย)";
+};
+$("#logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_IN" && $("#appView").classList.contains("hidden")) boot(); });
+
+// ---------------------------------------------------------------- data
+async function loadAll() {
+  const [g, c, l, a] = await Promise.all([
+    sb.from("games").select("*").order("created_at"),
+    sb.from("customers").select("*").order("created_at", { ascending: false }),
+    sb.from("license_list").select("*").order("created_at", { ascending: false }),
+    sb.from("admin_emails").select("*").order("created_at"),
+  ]);
+  for (const r of [g, c, l, a]) if (r.error) return fail(r.error);
+  games = g.data; customers = c.data; licenses = l.data; admins = a.data;
+  const keep = $("#gameFilter").value;
+  $("#gameFilter").innerHTML = `<option value="">ทุกเกม</option>` + games.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join("");
+  $("#gameFilter").value = games.some(x => x.id === keep) ? keep : "";
+  render();
+}
+
+function daysLeft(d) { return d ? Math.ceil((new Date(d) - Date.now()) / 86400000) : null; }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" }) : ""; }
+function ago(d) {
+  if (!d) return "—";
+  const s = (Date.now() - new Date(d)) / 1000;
+  if (s < 90) return "เมื่อกี้"; if (s < 3600) return Math.round(s / 60) + " นาทีก่อน";
+  if (s < 86400) return Math.round(s / 3600) + " ชม.ก่อน"; return Math.round(s / 86400) + " วันก่อน";
+}
+function stateOf(l) {
+  if (l.status === "suspended") return ["suspended", "ระงับ", "b-off"];
+  const d = daysLeft(l.expires_at);
+  if (d !== null && d <= 0) return ["expired", "หมดอายุ", "b-bad"];
+  if (d !== null && d <= 7) return ["soon", "เหลือ " + d + " วัน", "b-warn"];
+  return ["active", "ใช้งานได้", "b-ok"];
+}
+
+// ---------------------------------------------------------------- render
+function render() {
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  for (const t of ["licenses", "customers", "games"]) $("#tab-" + t).classList.toggle("hidden", t !== tab);
+  const gid = $("#gameFilter").value;
+  const L = licenses.filter(l => !gid || l.game_id === gid);
+  // stats
+  const st = { all: L.length, active: 0, soon: 0, expired: 0, suspended: 0, unused: 0 };
+  for (const l of L) { const s = stateOf(l)[0]; st[s === "soon" ? "soon" : s]++; if (s === "soon") st.active++; if (!l.device_count) st.unused++; }
+  const cards = [["", "ทั้งหมด", st.all], ["active", "ใช้งานได้", st.active], ["soon", "ใกล้หมด (7 วัน)", st.soon], ["expired", "หมดอายุ", st.expired], ["suspended", "ระงับ", st.suspended], ["unused", "ยังไม่เคยใช้", st.unused]];
+  $("#stats").innerHTML = cards.map(([k, t, n]) => `<div class="stat ${statFilter === k ? "on" : ""}" data-k="${k}"><b>${n}</b><span>${t}</span></div>`).join("");
+  document.querySelectorAll(".stat").forEach(e => e.onclick = () => { statFilter = e.dataset.k; $("#licState").value = statFilter; render(); });
+  // licenses
+  const q = $("#licSearch").value.trim().toLowerCase(), sf = $("#licState").value;
+  const rows = L.filter(l => {
+    const s = stateOf(l)[0];
+    if (sf === "active" && !(s === "active" || s === "soon")) return false;
+    if (sf && sf !== "active" && sf !== "unused" && s !== sf) return false;
+    if (sf === "unused" && l.device_count) return false;
+    if (q && !(`${l.key} ${l.customer_name || ""} ${l.customer_contact || ""} ${l.note || ""}`.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  $("#licBody").innerHTML = rows.length ? rows.map(l => {
+    const [, label, cls] = stateOf(l);
+    return `<tr>
+      <td><span class="mono copy" data-copy="${esc(l.key)}">${esc(l.key)}</span>${l.note ? `<div class="sub">${esc(l.note)}</div>` : ""}</td>
+      <td>${esc(l.customer_name || "—")}<div class="sub">${esc(l.customer_contact || "")}</div></td>
+      <td class="hide-m">${esc(l.game_name)}</td>
+      <td>${l.expires_at ? fmtDate(l.expires_at) : "ถาวร"}<div class="sub">${esc(l.plan || "")}</div></td>
+      <td class="hide-m">${l.device_count}/${l.device_limit}</td>
+      <td class="hide-m">${ago(l.last_seen_at)}${l.last_version ? `<div class="sub">v${esc(l.last_version)}</div>` : ""}</td>
+      <td><span class="badge ${cls}">${label}</span></td>
+      <td><div class="row-actions">
+        <button class="btn sm" data-act="extend" data-id="${l.id}">ต่ออายุ</button>
+        <button class="btn sm" data-act="more" data-id="${l.id}">⋯</button>
+      </div></td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">${licenses.length ? "ไม่พบไลเซนส์ตามที่ค้นหา" : "ยังไม่มีไลเซนส์ — กด \"+ ออกคีย์ใหม่\""}</td></tr>`;
+  // customers
+  const cq = $("#cusSearch").value.trim().toLowerCase();
+  const C = customers.filter(c => !cq || `${c.name} ${c.contact || ""} ${c.note || ""}`.toLowerCase().includes(cq));
+  $("#cusBody").innerHTML = C.length ? C.map(c => {
+    const mine = licenses.filter(l => l.customer_id === c.id && (!gid || l.game_id === gid));
+    const act = mine.filter(l => ["active", "soon"].includes(stateOf(l)[0])).length;
+    return `<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.contact || "—")}</td>
+      <td>${mine.length} คีย์ <span class="sub">(ใช้ได้ ${act})</span></td><td class="hide-m sub">${esc(c.note || "")}</td>
+      <td><div class="row-actions"><button class="btn sm" data-act="cus-lic" data-id="${c.id}">ดูคีย์</button>
+      <button class="btn sm" data-act="cus-new" data-id="${c.id}">+ คีย์</button><button class="btn sm" data-act="cus-edit" data-id="${c.id}">แก้ไข</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">ยังไม่มีลูกค้า</td></tr>`;
+  // games
+  $("#gameBody").innerHTML = games.map(g => `<tr><td><b>${esc(g.name)}</b></td><td class="mono">${esc(g.slug)}</td><td class="mono">${esc(g.key_prefix)}-</td>
+    <td class="hide-m">${g.offline_days} วัน</td><td class="hide-m">${g.max_devices}</td><td class="hide-m sub">${esc(g.contact || "")}</td>
+    <td><div class="row-actions"><button class="btn sm" data-act="game-edit" data-id="${g.id}">แก้ไข</button></div></td></tr>`).join("");
+  $("#adminBody").innerHTML = admins.map(a => `<tr><td>${esc(a.email)}</td><td><div class="row-actions">
+    <button class="btn sm danger" data-act="admin-del" data-id="${esc(a.email)}">ลบ</button></div></td></tr>`).join("");
+}
+
+// ---------------------------------------------------------------- dialogs
+function dialog(title, bodyHtml, buttons) {
+  $("#dlgTitle").textContent = title; $("#dlgBody").innerHTML = bodyHtml; $("#dlgFoot").innerHTML = "";
+  for (const [label, cls, fn] of buttons) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "btn " + (cls || ""); b.textContent = label;
+    b.onclick = async () => { if (!fn) return $("#dlg").close(); b.disabled = true; try { const keep = await fn(); if (keep !== true) $("#dlg").close(); } catch (e) { fail(e); } b.disabled = false; };
+    $("#dlgFoot").appendChild(b);
+  }
+  $("#dlg").showModal();
+}
+function chips(id, items, sel) {
+  return `<div class="chips" id="${id}">` + items.map(([v, t]) => `<button type="button" data-v="${v}" class="${v === sel ? "on" : ""}">${t}</button>`).join("") + `</div>`;
+}
+function bindChips(id, onPick) {
+  document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => {
+    document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle("on", x === b)); onPick && onPick(b.dataset.v); });
+}
+const chipVal = id => document.querySelector(`#${id} button.on`)?.dataset.v;
+const PLANS = [["7d", "7 วัน"], ["30d", "30 วัน"], ["90d", "90 วัน"], ["365d", "1 ปี"], ["permanent", "ถาวร"], ["custom", "เลือกวันที่"]];
+function planExpiry(plan, custom, from) {
+  if (plan === "permanent") return null;
+  if (plan === "custom") return custom ? new Date(custom + "T23:59:59").toISOString() : null;
+  const d = new Date(from && new Date(from) > new Date() ? from : Date.now()); d.setDate(d.getDate() + parseInt(plan)); return d.toISOString();
+}
+const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function makeKey(prefix) {
+  const r = new Uint8Array(12); crypto.getRandomValues(r);
+  let s = ""; for (let i = 0; i < 12; i++) { s += ALPHA[r[i] % 32]; if (i % 4 === 3 && i < 11) s += "-"; }
+  return prefix + "-" + s;
+}
+
+function newLicense(customerId) {
+  const gid = $("#gameFilter").value || games[0]?.id;
+  dialog("ออกคีย์ใหม่", `
+    <label class="f">เกม<select id="nlGame">${games.map(g => `<option value="${g.id}" ${g.id === gid ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
+    <label class="f">ลูกค้า<select id="nlCus"><option value="__new">+ ลูกค้าใหม่</option>${customers.map(c => `<option value="${c.id}" ${c.id === customerId ? "selected" : ""}>${esc(c.name)}${c.contact ? " — " + esc(c.contact) : ""}</option>`).join("")}</select></label>
+    <div class="grid2" id="nlNew"><label class="f">ชื่อลูกค้า<input type="text" id="nlName" placeholder="เช่น ร้านน้องเอ"></label>
+      <label class="f">ช่องทางติดต่อ<input type="text" id="nlContact" placeholder="LINE / FB / เบอร์"></label></div>
+    <label class="f">แพ็กเกจ${chips("nlPlan", PLANS, "30d")}</label>
+    <label class="f hidden" id="nlCustomWrap">หมดอายุวันที่<input type="date" id="nlCustom"></label>
+    <div class="grid2"><label class="f">จำนวนคีย์<input type="number" id="nlCount" value="1" min="1" max="50"></label>
+      <label class="f">หมายเหตุ<input type="text" id="nlNote" placeholder="เช่น โอนแล้ว 299 บาท"></label></div>`,
+    [["ยกเลิก", "", null], ["ออกคีย์", "primary", async () => {
+      const game = games.find(g => g.id === $("#nlGame").value);
+      let cid = $("#nlCus").value;
+      if (cid === "__new") {
+        const name = $("#nlName").value.trim(); if (!name) { toast("ใส่ชื่อลูกค้าก่อน"); return true; }
+        const { data, error } = await sb.from("customers").insert({ name, contact: $("#nlContact").value.trim() || null }).select().single();
+        if (error) throw error; cid = data.id;
+      }
+      const plan = chipVal("nlPlan"), custom = $("#nlCustom").value;
+      if (plan === "custom" && !custom) { toast("เลือกวันหมดอายุก่อน"); return true; }
+      const n = Math.max(1, Math.min(50, parseInt($("#nlCount").value) || 1));
+      const rows = Array.from({ length: n }, () => ({ key: makeKey(game.key_prefix), game_id: game.id, customer_id: cid, plan: plan === "custom" ? "custom" : plan,
+        expires_at: planExpiry(plan, custom), note: $("#nlNote").value.trim() || null }));
+      const { data, error } = await sb.from("licenses").insert(rows).select();
+      if (error) throw error;
+      await loadAll();
+      showKeys(data, game);
+      return true;
+    }]]);
+  const sync = () => $("#nlNew").classList.toggle("hidden", $("#nlCus").value !== "__new");
+  $("#nlCus").onchange = sync; sync();
+  bindChips("nlPlan", v => $("#nlCustomWrap").classList.toggle("hidden", v !== "custom"));
+}
+
+function showKeys(rows, game) {
+  const cus = customers.find(c => c.id === rows[0].customer_id);
+  const exp = rows[0].expires_at ? "หมดอายุ " + fmtDate(rows[0].expires_at) : "ใช้ได้ถาวร";
+  const keys = rows.map(r => r.key).join("\n");
+  const msg = `คีย์ ${game.name}${cus ? " ของ " + cus.name : ""} (${exp})\n${keys}\n\nวิธีใช้: เปิดเกม ใส่คีย์ในหน้าแรก แล้วกดยืนยัน (1 คีย์ใช้ได้ ${game.max_devices} เครื่อง)`;
+  dialog("ออกคีย์แล้ว " + rows.length + " คีย์", `<div class="keys mono">${esc(keys)}</div><div class="sub">${esc(exp)}</div>`,
+    [["คัดลอกคีย์", "", async () => { await copy(keys); return true; }], ["คัดลอกข้อความส่งลูกค้า", "primary", async () => { await copy(msg, "คัดลอกข้อความแล้ว"); return true; }], ["ปิด", "", null]]);
+}
+
+function extendLicense(id) {
+  const l = licenses.find(x => x.id === id);
+  dialog("ต่ออายุ " + l.key, `<div class="sub">ตอนนี้: ${l.expires_at ? "หมดอายุ " + fmtDate(l.expires_at) : "ถาวร"}</div>
+    ${chips("exPlan", PLANS, "30d")}<label class="f hidden" id="exCustomWrap">หมดอายุวันที่<input type="date" id="exCustom"></label>
+    <div class="sub">ถ้ายังไม่หมดอายุ จะนับต่อจากวันหมดอายุเดิม</div>`,
+    [["ยกเลิก", "", null], ["ต่ออายุ", "primary", async () => {
+      const plan = chipVal("exPlan"), custom = $("#exCustom").value;
+      if (plan === "custom" && !custom) { toast("เลือกวันที่ก่อน"); return true; }
+      const exp = planExpiry(plan, custom, l.expires_at);
+      const { error } = await sb.from("licenses").update({ expires_at: exp, plan: plan, status: "active" }).eq("id", id);
+      if (error) throw error;
+      await sb.from("license_events").insert({ license_id: id, kind: "extended", detail: { plan, expires_at: exp } });
+      toast("ต่ออายุแล้ว"); await loadAll();
+    }]]);
+  bindChips("exPlan", v => $("#exCustomWrap").classList.toggle("hidden", v !== "custom"));
+}
+
+async function moreLicense(id) {
+  const l = licenses.find(x => x.id === id);
+  const { data: acts } = await sb.from("activations").select("*").eq("license_id", id).order("first_seen_at");
+  const { data: evs } = await sb.from("license_events").select("*").eq("license_id", id).order("created_at", { ascending: false }).limit(8);
+  const kinds = { activated: "เปิดใช้บนเครื่องใหม่", refused_device: "ถูกปฏิเสธ: เครื่องอื่น", refused_suspended: "ถูกปฏิเสธ: ระงับอยู่", extended: "ต่ออายุ", reset: "รีเซ็ตเครื่อง", suspended: "ระงับ", resumed: "เปิดใช้อีกครั้ง" };
+  dialog(l.key, `
+    <div class="sub">${esc(l.game_name)} • ${esc(l.customer_name || "ไม่มีชื่อลูกค้า")} • ${l.expires_at ? "หมดอายุ " + fmtDate(l.expires_at) : "ถาวร"}</div>
+    <label class="f">เครื่องที่ใช้ (${(acts || []).length}/${l.device_limit})
+      <div>${(acts || []).map(a => `<div>💻 ${esc(a.machine_name || "ไม่ทราบชื่อ")} <span class="sub mono">${esc(a.machine_id.slice(0, 10))}… • ${ago(a.last_seen_at)}</span></div>`).join("") || `<span class="sub">ยังไม่มี</span>`}</div></label>
+    <label class="f">หมายเหตุ<input type="text" id="mNote" value="${esc(l.note || "")}"></label>
+    <label class="f">ประวัติล่าสุด<div class="sub">${(evs || []).map(e => `${new Date(e.created_at).toLocaleString("th-TH")} — ${kinds[e.kind] || e.kind}`).join("<br>") || "—"}</div></label>`,
+    [["ลบคีย์", "danger", async () => {
+      if (!confirm("ลบคีย์ " + l.key + " ถาวร?")) return true;
+      const { error } = await sb.from("licenses").delete().eq("id", id); if (error) throw error; toast("ลบแล้ว"); await loadAll(); }],
+     ["รีเซ็ตเครื่อง", "", async () => {
+      const { error } = await sb.from("activations").delete().eq("license_id", id); if (error) throw error;
+      await sb.from("license_events").insert({ license_id: id, kind: "reset" }); toast("รีเซ็ตแล้ว — ใช้กับเครื่องใหม่ได้"); await loadAll(); }],
+     [l.status === "suspended" ? "เปิดใช้อีกครั้ง" : "ระงับคีย์", "", async () => {
+      const ns = l.status === "suspended" ? "active" : "suspended";
+      const { error } = await sb.from("licenses").update({ status: ns }).eq("id", id); if (error) throw error;
+      await sb.from("license_events").insert({ license_id: id, kind: ns === "active" ? "resumed" : "suspended" }); toast(ns === "active" ? "เปิดใช้แล้ว" : "ระงับแล้ว"); await loadAll(); }],
+     ["บันทึก", "primary", async () => {
+      const { error } = await sb.from("licenses").update({ note: $("#mNote").value.trim() || null }).eq("id", id); if (error) throw error; await loadAll(); }]]);
+}
+
+function editCustomer(id) {
+  const c = customers.find(x => x.id === id) || {};
+  dialog(id ? "แก้ไขลูกค้า" : "เพิ่มลูกค้า", `
+    <label class="f">ชื่อ<input type="text" id="cName" value="${esc(c.name || "")}"></label>
+    <label class="f">ช่องทางติดต่อ<input type="text" id="cContact" value="${esc(c.contact || "")}" placeholder="LINE / FB / เบอร์ / อีเมล"></label>
+    <label class="f">หมายเหตุ<textarea id="cNote" rows="2">${esc(c.note || "")}</textarea></label>`,
+    [...(id ? [["ลบลูกค้า", "danger", async () => {
+      if (!confirm("ลบลูกค้า " + c.name + "? (คีย์ของเขายังอยู่ แต่จะไม่มีชื่อลูกค้า)")) return true;
+      const { error } = await sb.from("customers").delete().eq("id", id); if (error) throw error; await loadAll(); }]] : []),
+     ["ยกเลิก", "", null], ["บันทึก", "primary", async () => {
+      const row = { name: $("#cName").value.trim(), contact: $("#cContact").value.trim() || null, note: $("#cNote").value.trim() || null };
+      if (!row.name) { toast("ใส่ชื่อก่อน"); return true; }
+      const { error } = id ? await sb.from("customers").update(row).eq("id", id) : await sb.from("customers").insert(row);
+      if (error) throw error; await loadAll(); }]]);
+}
+
+function editGame(id) {
+  const g = games.find(x => x.id === id) || { offline_days: 3, max_devices: 1 };
+  dialog(id ? "แก้ไขเกม" : "เพิ่มเกม", `
+    <div class="grid2"><label class="f">ชื่อเกม<input type="text" id="gName" value="${esc(g.name || "")}"></label>
+      <label class="f">รหัสเกม (ใช้ในโค้ดเกม)<input type="text" id="gSlug" class="mono" value="${esc(g.slug || "")}" placeholder="เช่น swimlive" ${id ? "disabled" : ""}></label></div>
+    <div class="grid2"><label class="f">หน้าคีย์ (A-Z, 0-9)<input type="text" id="gPrefix" class="mono" value="${esc(g.key_prefix || "")}" placeholder="เช่น SWIM"></label>
+      <label class="f">เล่นออฟไลน์ได้ (วัน)<input type="number" id="gOff" min="0" max="60" value="${g.offline_days}"></label></div>
+    <div class="grid2"><label class="f">เครื่องต่อ 1 คีย์<input type="number" id="gMax" min="1" max="50" value="${g.max_devices}"></label>
+      <label class="f">ติดต่อซื้อ (โชว์ในเกม)<input type="text" id="gContact" value="${esc(g.contact || "")}" placeholder="เช่น LINE: @mygames"></label></div>
+    ${id ? `<div class="sub">ใส่ในเกม: <span class="mono">LicenseGate.GameSlug = "${esc(g.slug)}"</span></div>` : ""}`,
+    [["ยกเลิก", "", null], ["บันทึก", "primary", async () => {
+      const row = { name: $("#gName").value.trim(), key_prefix: $("#gPrefix").value.trim().toUpperCase(), offline_days: parseInt($("#gOff").value) || 0,
+        max_devices: parseInt($("#gMax").value) || 1, contact: $("#gContact").value.trim() || null };
+      if (!id) row.slug = $("#gSlug").value.trim().toLowerCase();
+      if (!row.name || !row.key_prefix || (!id && !row.slug)) { toast("กรอกชื่อ รหัสเกม และหน้าคีย์"); return true; }
+      const { error } = id ? await sb.from("games").update(row).eq("id", id) : await sb.from("games").insert(row);
+      if (error) throw error; toast("บันทึกแล้ว"); await loadAll(); }]]);
+}
+
+// ---------------------------------------------------------------- events
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-copy]"); if (c) return copy(c.dataset.copy);
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const id = b.dataset.id;
+  switch (b.dataset.act) {
+    case "extend": return extendLicense(id);
+    case "more": return moreLicense(id).catch(fail);
+    case "cus-edit": return editCustomer(id);
+    case "cus-new": return newLicense(id);
+    case "cus-lic": { const c = customers.find(x => x.id === id); tab = "licenses"; $("#licSearch").value = c.name; return render(); }
+    case "game-edit": return editGame(id);
+    case "admin-del":
+      if (admins.length <= 1) return toast("ต้องมีแอดมินอย่างน้อย 1 คน");
+      if (!confirm("ลบแอดมิน " + id + "?")) return;
+      return sb.from("admin_emails").delete().eq("email", id).then(r => r.error ? fail(r.error) : loadAll());
+  }
+});
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+$("#gameFilter").onchange = render; $("#licSearch").oninput = render; $("#cusSearch").oninput = render;
+$("#licState").onchange = () => { statFilter = $("#licState").value; render(); };
+$("#newLicBtn").onclick = () => newLicense();
+$("#newCusBtn").onclick = () => editCustomer();
+$("#newGameBtn").onclick = () => editGame();
+$("#newAdminBtn").onclick = () => dialog("เพิ่มแอดมิน", `<label class="f">อีเมล<input type="email" id="aEmail"></label><div class="sub">คนนี้จะล็อกอินเว็บนี้ด้วยลิงก์ทางอีเมลได้</div>`,
+  [["ยกเลิก", "", null], ["เพิ่ม", "primary", async () => {
+    const email = $("#aEmail").value.trim().toLowerCase(); if (!email.includes("@")) { toast("อีเมลไม่ถูกต้อง"); return true; }
+    const { error } = await sb.from("admin_emails").insert({ email }); if (error) throw error; await loadAll(); }]]);
+
+boot();
+</script>
+</body>
+</html>
