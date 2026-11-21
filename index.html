@@ -443,11 +443,27 @@ function editGame(id) {
     <div class="grid2"><label class="f">เครื่องต่อ 1 คีย์<input type="number" id="gMax" min="1" max="50" value="${g.max_devices}"></label>
       <label class="f">ติดต่อซื้อ (โชว์ในเกม)<input type="text" id="gContact" value="${esc(g.contact || "")}" placeholder="เช่น LINE: @mygames"></label></div>
     ${id ? `<div class="sub">ใส่ในเกม: <span class="mono">LicenseGate.GameSlug = "${esc(g.slug)}"</span></div>` : ""}`,
-    [["ยกเลิก", "", null], ["บันทึก", "primary", async () => {
+    [...(id ? [["ลบเกม", "danger", async () => {
+      // licenses (and their machines and history) go with the game: the database deletes them in cascade
+      const n = licenses.filter(l => l.game_id === id).length;
+      if (n === 0) {
+        if (!confirm("ลบเกม " + g.name + " (" + g.slug + ")?")) return true;
+      } else {
+        const typed = prompt("เกม " + g.name + " มีคีย์อยู่ " + n + " คีย์\nลบเกมแล้วคีย์ทั้งหมดของเกมนี้จะถูกลบด้วย ลูกค้าจะเปิดเกมไม่ได้ทันที\n\nพิมพ์รหัสเกม " + g.slug + " เพื่อยืนยันการลบ");
+        if (typed === null) return true;
+        if (typed.trim().toLowerCase() !== g.slug) { toast("รหัสเกมไม่ตรง ยังไม่ได้ลบ"); return true; }
+      }
+      const { error } = await sb.from("games").delete().eq("id", id); if (error) throw error;
+      toast("ลบเกมแล้ว" + (n ? " (และคีย์ " + n + " คีย์)" : "")); await loadAll(); }]] : []),
+     ["ยกเลิก", "", null], ["บันทึก", "primary", async () => {
       const row = { name: $("#gName").value.trim(), key_prefix: $("#gPrefix").value.trim().toUpperCase(), offline_days: parseInt($("#gOff").value) || 0,
         max_devices: parseInt($("#gMax").value) || 1, contact: $("#gContact").value.trim() || null };
       if (!id) row.slug = $("#gSlug").value.trim().toLowerCase();
       if (!row.name || !row.key_prefix || (!id && !row.slug)) { toast("กรอกชื่อ รหัสเกม และหน้าคีย์"); return true; }
+      // the same rules as the database, said in words instead of "violates check constraint"
+      if (!id && !/^[a-z0-9-]{2,40}$/.test(row.slug)) { toast("รหัสเกมใช้ได้แค่ a-z ตัวเล็ก 0-9 และ - (2-40 ตัว) ห้ามมีเว้นวรรคหรือ _ เช่น bricklive"); return true; }
+      if (!/^[A-Z0-9]{2,8}$/.test(row.key_prefix)) { toast("หน้าคีย์ใช้ได้แค่ A-Z และ 0-9 (2-8 ตัว) เช่น BRICK"); return true; }
+      if (!id && games.some(x => x.slug === row.slug)) { toast("มีเกมรหัส " + row.slug + " อยู่แล้ว"); return true; }
       const { error } = id ? await sb.from("games").update(row).eq("id", id) : await sb.from("games").insert(row);
       if (error) throw error; toast("บันทึกแล้ว"); await loadAll(); }]]);
 }
